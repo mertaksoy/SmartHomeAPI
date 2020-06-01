@@ -20,6 +20,17 @@ app.get('/groups', (req: any, res: any) => {
     res.send(tradfri.groups);
 });
 
+app.post('/groups/:groupId/toggle', (req: any, res: any) => {
+    const groupId = req.params.groupId;
+    const group = tradfri.groups[groupId];
+    if (!!group) {
+        tradfri.operateGroup(group.group, {onOff: !group.group.onOff}, true);
+    } else {
+        // TODO: Bad Request
+    }
+    res.send()
+});
+
 app.listen(port, () => {
     discoverGateway().then((discoveredGateway: DiscoveredGateway | null) => {
         if (discoveredGateway) {
