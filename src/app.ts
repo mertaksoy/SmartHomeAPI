@@ -1,5 +1,6 @@
 import {DiscoveredGateway, discoverGateway, TradfriClient} from "node-tradfri-client";
 
+const cors = require('cors');
 const express = require('express');
 const app = express();
 
@@ -7,6 +8,9 @@ const port = 3000;
 const securityCode = '';
 let tradfriGateway: DiscoveredGateway;
 let tradfri: TradfriClient;
+
+
+app.use(cors());
 
 app.get('/', (req: any, res: any) => {
     res.send('API is running. Discovered gateway: ' + tradfriGateway.name);
