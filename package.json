@@ -11,5 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "node-tradfri-client": "^2.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.6",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.3"
   }
 }
