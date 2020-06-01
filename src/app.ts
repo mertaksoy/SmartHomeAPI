@@ -9,9 +9,15 @@ let tradfriGateway: DiscoveredGateway;
 let tradfri: TradfriClient;
 
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write('<html><body><p> API is running. Discovered gateway: ' + tradfriGateway.name + '</p></body></html>');
-    res.end();
+    if (req.url == '/') {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.write('<html><body><p> API is running. Discovered gateway: ' + tradfriGateway.name + '</p></body></html>');
+        res.end();
+    } else if (req.url == '/devices') {
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.write(JSON.stringify(tradfri.devices));
+        res.end();
+    }
 });
 
 server.listen(port, hostname, () => {
