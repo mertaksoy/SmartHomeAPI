@@ -1,26 +1,26 @@
 import {DiscoveredGateway, discoverGateway, TradfriClient} from "node-tradfri-client";
-import {ServerResponse, createServer, IncomingMessage} from "http";
 
-const hostname = '127.0.0.1';
+const express = require('express');
+const app = express();
+
 const port = 3000;
 const securityCode = '';
-
 let tradfriGateway: DiscoveredGateway;
 let tradfri: TradfriClient;
 
-const server = createServer((req: IncomingMessage, res: ServerResponse) => {
-    if (req.url == '/') {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write('<html><body><p> API is running. Discovered gateway: ' + tradfriGateway.name + '</p></body></html>');
-        res.end();
-    } else if (req.url == '/devices') {
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.write(JSON.stringify(tradfri.devices));
-        res.end();
-    }
+app.get('/', (req: any, res: any) => {
+    res.send('API is running. Discovered gateway: ' + tradfriGateway.name);
 });
 
-server.listen(port, hostname, () => {
+app.get('/devices', (req: any, res: any) => {
+    res.send(JSON.stringify(tradfri.devices));
+});
+
+app.get('/groups', (req: any, res: any) => {
+    res.send(JSON.stringify(tradfri.groups));
+});
+
+app.listen(port, () => {
     discoverGateway().then((discoveredGateway: DiscoveredGateway | null) => {
         if (discoveredGateway) {
             tradfriGateway = discoveredGateway;
@@ -29,9 +29,11 @@ server.listen(port, hostname, () => {
                 tradfri.authenticate(securityCode).then((authToken) => {
                     tradfri.connect(authToken.identity, authToken.psk);
                     tradfri.observeDevices();
+                    tradfri.observeGroupsAndScenes();
+                    console.log('Authenticated and connected successfully');
+                    console.log(`Example app listening at http://localhost:${port}`)
                 });
             }
         }
     });
-    console.log(`Server running at http://${hostname}:${port}/`);
 });
