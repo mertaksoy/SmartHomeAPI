@@ -13,11 +13,11 @@ app.get('/', (req: any, res: any) => {
 });
 
 app.get('/devices', (req: any, res: any) => {
-    res.send(JSON.stringify(tradfri.devices));
+    res.send(tradfri.devices);
 });
 
 app.get('/groups', (req: any, res: any) => {
-    res.send(JSON.stringify(tradfri.groups));
+    res.send(tradfri.groups);
 });
 
 app.listen(port, () => {
