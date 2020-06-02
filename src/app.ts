@@ -6,14 +6,13 @@ const app = express();
 
 const port = 3000;
 const securityCode = '';
-let tradfriGateway: DiscoveredGateway;
+let tradfriGateway: DiscoveredGateway | null;
 let tradfri: TradfriClient;
-
 
 app.use(cors());
 
 app.get('/', (req: any, res: any) => {
-    res.send('API is running. Discovered gateway: ' + tradfriGateway.name);
+    res.send('API is running. Discovered gateway: ' + (tradfriGateway ? tradfriGateway.name : '-'));
 });
 
 app.get('/devices', (req: any, res: any) => {
@@ -24,35 +23,30 @@ app.get('/groups', (req: any, res: any) => {
     res.send(tradfri.groups);
 });
 
-app.post('/groups/:groupId/toggle', (req: any, res: any) => {
+app.post('/groups/:groupId/toggle', async (req: any, res: any) => {
     const groupId = req.params.groupId;
     const group = tradfri.groups[groupId];
     if (!!group) {
-        tradfri.operateGroup(group.group, {onOff: !group.group.onOff}, true).then((updateResult) => {
-            res.send({toggled: updateResult});
-        }).catch(() => res.send({toggled: false}));
-    } else {
-        res.send({toggled: false});
+        res.send({
+            toggled: await tradfri.operateGroup(group.group, {onOff: !group.group.onOff}, true)
+        });
     }
+    res.send({toggled: false});
 });
 
-app.listen(port, () => {
-    discoverGateway().then((discoveredGateway: DiscoveredGateway | null) => {
-        if (discoveredGateway) {
-            tradfriGateway = discoveredGateway;
-            if (tradfriGateway.host != null) {
-                tradfri = new TradfriClient(tradfriGateway.host);
-                tradfri.authenticate(securityCode).then((authToken) => {
-                    tradfri.connect(authToken.identity, authToken.psk);
-                    tradfri.observeGroupsAndScenes();
-                    tradfri.on('device updated', deviceUpdated).observeDevices();
+app.listen(port, async () => {
+    tradfriGateway = await discoverGateway();
+    if (tradfriGateway && !!tradfriGateway.host) {
+        tradfri = new TradfriClient(tradfriGateway.host);
+        const authToken = await tradfri.authenticate(securityCode);
 
-                    console.log('Authenticated and connected successfully');
-                    console.log(`Example app listening at http://localhost:${port}`)
-                });
-            }
-        }
-    });
+        tradfri.connect(authToken.identity, authToken.psk);
+        tradfri.observeGroupsAndScenes();
+        tradfri.on('device updated', deviceUpdated).observeDevices();
+
+        console.log('Authenticated and connected successfully');
+        console.log(`Example app listening at http://localhost:${port}`)
+    }
 });
 
 function deviceUpdated(device: Accessory) {
