@@ -1,4 +1,4 @@
-import {Accessory, DiscoveredGateway, discoverGateway, Group, GroupInfo, TradfriClient} from "node-tradfri-client";
+import {Accessory, AccessoryTypes, DiscoveredGateway, discoverGateway, TradfriClient} from "node-tradfri-client";
 
 const cors = require('cors');
 const express = require('express');
@@ -58,7 +58,7 @@ app.listen(port, () => {
 function deviceUpdated(device: Accessory) {
     Object.keys(tradfri.groups).forEach((key: string) => {
         const deviceInGroup = tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
-        if (deviceInGroup) {
+        if (deviceInGroup && device.type === AccessoryTypes.lightbulb) {
             tradfri.groups[key].group.onOff = device.lightList[0].onOff;
         }
     })
