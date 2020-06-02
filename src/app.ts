@@ -1,4 +1,4 @@
-import {DiscoveredGateway, discoverGateway, TradfriClient} from "node-tradfri-client";
+import {Accessory, DiscoveredGateway, discoverGateway, Group, GroupInfo, TradfriClient} from "node-tradfri-client";
 
 const cors = require('cors');
 const express = require('express');
@@ -44,8 +44,9 @@ app.listen(port, () => {
                 tradfri = new TradfriClient(tradfriGateway.host);
                 tradfri.authenticate(securityCode).then((authToken) => {
                     tradfri.connect(authToken.identity, authToken.psk);
-                    tradfri.observeDevices();
                     tradfri.observeGroupsAndScenes();
+                    tradfri.on('device updated', deviceUpdated).observeDevices();
+
                     console.log('Authenticated and connected successfully');
                     console.log(`Example app listening at http://localhost:${port}`)
                 });
@@ -53,3 +54,12 @@ app.listen(port, () => {
         }
     });
 });
+
+function deviceUpdated(device: Accessory) {
+    Object.keys(tradfri.groups).forEach((key: string) => {
+        const deviceInGroup = tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
+        if (deviceInGroup) {
+            tradfri.groups[key].group.onOff = device.lightList[0].onOff;
+        }
+    })
+}
