@@ -28,11 +28,12 @@ app.post('/groups/:groupId/toggle', (req: any, res: any) => {
     const groupId = req.params.groupId;
     const group = tradfri.groups[groupId];
     if (!!group) {
-        tradfri.operateGroup(group.group, {onOff: !group.group.onOff}, true);
+        tradfri.operateGroup(group.group, {onOff: !group.group.onOff}, true).then((updateResult) => {
+            res.send({toggled: updateResult});
+        }).catch(() => res.send({toggled: false}));
     } else {
-        // TODO: Bad Request
+        res.send({toggled: false});
     }
-    res.send()
 });
 
 app.listen(port, () => {
