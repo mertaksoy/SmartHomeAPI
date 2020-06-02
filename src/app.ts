@@ -45,10 +45,15 @@ app.listen(port, async () => {
         tradfri.on('device updated', deviceUpdated).observeDevices();
 
         console.log('Authenticated and connected successfully');
-        console.log(`Example app listening at http://localhost:${port}`)
+        console.log(`API listening at http://localhost:${port}`)
     }
 });
 
+/**
+ * Workaround for the issue https://github.com/AlCalzone/node-tradfri-client/issues/390
+ * Updating group onOff status when device status change
+ * @param device
+ */
 function deviceUpdated(device: Accessory) {
     Object.keys(tradfri.groups).forEach((key: string) => {
         const deviceInGroup = tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
