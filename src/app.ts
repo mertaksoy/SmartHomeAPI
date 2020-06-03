@@ -1,4 +1,5 @@
-import * as tradfriNode from 'node-tradfri-client';
+import * as tradfriClient from 'node-tradfri-client';
+import {DiscoveredGateway, TradfriClient, Accessory} from "node-tradfri-client";
 
 const cors = require('cors');
 const express = require('express');
@@ -6,8 +7,8 @@ const app = express();
 
 const port = 3000;
 const securityCode = '';
-let tradfriGateway: tradfriNode.DiscoveredGateway | null;
-let tradfri: tradfriNode.TradfriClient;
+let tradfriGateway: DiscoveredGateway | null;
+let tradfri: TradfriClient;
 
 app.use(cors());
 
@@ -35,9 +36,9 @@ app.post('/groups/:groupId/toggle', async (req: any, res: any) => {
 });
 
 const server = app.listen(port, async () => {
-    tradfriGateway = await tradfriNode.discoverGateway();
+    tradfriGateway = await tradfriClient.discoverGateway();
     if (tradfriGateway && !!tradfriGateway.host) {
-        tradfri = new tradfriNode.TradfriClient(tradfriGateway.host);
+        tradfri = new TradfriClient(tradfriGateway.host);
         const authToken = await tradfri.authenticate(securityCode);
 
         tradfri.connect(authToken.identity, authToken.psk);
@@ -47,7 +48,7 @@ const server = app.listen(port, async () => {
         console.log('Authenticated and connected successfully');
         console.log(`API listening at http://localhost:${port}`)
     } else {
-        console.log('########');
+        // TODO: Error handling (tradfri gateway not found)
     }
 });
 
@@ -56,10 +57,10 @@ const server = app.listen(port, async () => {
  * Updating group onOff status when device status change
  * @param device
  */
-function deviceUpdated(device: tradfriNode.Accessory) {
+function deviceUpdated(device: Accessory) {
     Object.keys(tradfri.groups).forEach((key: string) => {
         const deviceInGroup = tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
-        if (deviceInGroup && device.type === tradfriNode.AccessoryTypes.lightbulb) {
+        if (deviceInGroup && device.type === tradfriClient.AccessoryTypes.lightbulb) {
             tradfri.groups[key].group.onOff = device.lightList[0].onOff;
         }
     })
