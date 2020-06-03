@@ -1,6 +1,5 @@
 import * as tradfriClient from 'node-tradfri-client';
-import {DiscoveredGateway, TradfriClient, Accessory, GroupInfo} from 'node-tradfri-client';
-import {Group} from "node-tradfri-client";
+import {DiscoveredGateway, TradfriClient, Accessory, GroupInfo, AccessoryTypes, Group} from 'node-tradfri-client';
 
 export class Client {
     private securityCode = '';
@@ -51,7 +50,7 @@ export class Client {
     private updateGroupOnOffStatus(device: Accessory): void {
         Object.keys(this.tradfri.groups).forEach((key: string) => {
             const deviceInGroup = this.tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
-            if (deviceInGroup && device.type === tradfriClient.AccessoryTypes.lightbulb) {
+            if (deviceInGroup && device.type === AccessoryTypes.lightbulb) {
                 this.tradfri.groups[key].group.onOff = device.lightList[0].onOff;
             }
         })
