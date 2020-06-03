@@ -15,7 +15,7 @@ export class Client {
 
             this._tradfri.connect(authToken.identity, authToken.psk);
             this._tradfri.observeGroupsAndScenes();
-            this._tradfri.on('device updated', this.updateGroupOnOffStatusOnDeviceUpdated).observeDevices();
+            this._tradfri.on('device updated', this.updateGroupOnOffStatus).observeDevices();
 
             console.log('Authenticated and connected successfully');
             return true;
@@ -48,7 +48,7 @@ export class Client {
      * Updating group onOff status when device status change
      * @param device
      */
-    private updateGroupOnOffStatusOnDeviceUpdated(device: Accessory): void {
+    private updateGroupOnOffStatus(device: Accessory): void {
         Object.keys(this.tradfri.groups).forEach((key: string) => {
             const deviceInGroup = this.tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
             if (deviceInGroup && device.type === tradfriClient.AccessoryTypes.lightbulb) {
