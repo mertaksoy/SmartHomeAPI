@@ -24,19 +24,23 @@ export class Client {
     }
 
     async operateGroup(group: Group, onOff: boolean) {
-        return this._tradfri.operateGroup(group, {onOff: onOff}, true);
+        return this.tradfri.operateGroup(group, {onOff: onOff}, true);
     }
 
     get devices(): Record<string, Accessory> {
-        return this._tradfri.devices;
+        return this.tradfri.devices;
     }
 
     get groups(): Record<string, GroupInfo> {
-        return this._tradfri.groups;
+        return this.tradfri.groups;
     }
 
     get tradfriGateway(): DiscoveredGateway | undefined {
         return this._tradfriGateway;
+    }
+
+    get tradfri(): TradfriClient {
+        return this._tradfri;
     }
 
     /**
@@ -44,11 +48,11 @@ export class Client {
      * Updating group onOff status when device status change
      * @param device
      */
-    private deviceUpdated(device: Accessory) {
-        Object.keys(this._tradfri.groups).forEach((key: string) => {
-            const deviceInGroup = this._tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
+    private deviceUpdated(device: Accessory): void {
+        Object.keys(this.tradfri.groups).forEach((key: string) => {
+            const deviceInGroup = this.tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
             if (deviceInGroup && device.type === tradfriClient.AccessoryTypes.lightbulb) {
-                this._tradfri.groups[key].group.onOff = device.lightList[0].onOff;
+                this.tradfri.groups[key].group.onOff = device.lightList[0].onOff;
             }
         })
     }

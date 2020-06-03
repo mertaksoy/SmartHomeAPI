@@ -29,6 +29,7 @@ app.post('/groups/:groupId/toggle', async (req: any, res: any) => {
         res.send({
             toggled: await client.operateGroup(group.group, !group.group.onOff)
         });
+        return;
     }
     res.send({toggled: false});
 });
