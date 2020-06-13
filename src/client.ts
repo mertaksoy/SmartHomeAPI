@@ -14,7 +14,7 @@ export class Client {
 
             this._tradfri.connect(authToken.identity, authToken.psk);
             this._tradfri.observeGroupsAndScenes();
-            this._tradfri.on('device updated', this.updateGroupOnOffStatus).observeDevices();
+            this._tradfri.on('device updated', (device => this.updateGroupOnOffStatus(device))).observeDevices();
 
             console.log('Authenticated and connected successfully');
             return true;
@@ -52,6 +52,7 @@ export class Client {
             const deviceInGroup = this.tradfri.groups[key].group.deviceIDs.find((deviceId: number) => deviceId === device.instanceId);
             if (deviceInGroup && device.type === AccessoryTypes.lightbulb) {
                 this.tradfri.groups[key].group.onOff = device.lightList[0].onOff;
+                this.tradfri.groups[key].group.dimmer = device.lightList[0].dimmer;
             }
         })
     }
