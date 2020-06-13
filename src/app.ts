@@ -34,6 +34,19 @@ app.post('/groups/:groupId/toggle', async (req: any, res: any) => {
     res.send({toggled: false});
 });
 
+app.post('/groups/:groupId/dimmer/:value', async (req: any, res: any) => {
+    const groupId = req.params.groupId;
+    const group = client.groups[groupId];
+    if (!!group) {
+        res.send({
+            dimmed: await client.operateGroupForDimming(group.group, req.params.value),
+            value: req.params.value
+        });
+        return;
+    }
+    res.send({toggled: false});
+});
+
 const server = app.listen(port, async () => {
     const isConnected = await client.connect();
     if (isConnected) {

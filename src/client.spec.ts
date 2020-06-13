@@ -2,13 +2,9 @@ import sinon, {SinonSandbox} from 'sinon';
 
 import * as tradfri from 'node-tradfri-client';
 import {
-    Accessory,
-    AccessoryTypes,
     DiscoveredGateway,
     discoverGateway,
     Group,
-    GroupInfo,
-    Light,
     TradfriClient
 } from 'node-tradfri-client';
 import {Client} from './client';
@@ -59,6 +55,12 @@ describe('Client', () => {
         it('should operate for group', async () => {
             sandbox.stub(TradfriClient.prototype, 'operateGroup').resolves(true);
             const operationResult = await client.operateGroup({} as Group, true);
+            assert.strictEqual(operationResult, true);
+        });
+
+        it('should operate for dimming of group', async () => {
+            sandbox.stub(TradfriClient.prototype, 'operateGroup').resolves(true);
+            const operationResult = await client.operateGroupForDimming({} as Group, 5);
             assert.strictEqual(operationResult, true);
         });
 

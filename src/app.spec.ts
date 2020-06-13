@@ -110,4 +110,25 @@ describe('Smart Home API', () => {
                 });
         });
     });
+
+    describe('Set Dimmer', () => {
+        let operationGroupStub: SinonStub;
+
+        beforeEach(() => {
+            const groupInfo = {group: {instanceId: 1} as Group} as GroupInfo;
+            sandbox.stub(Client.prototype, 'groups').value({131074: groupInfo});
+            operationGroupStub = sandbox.stub(Client.prototype, 'operateGroupForDimming').resolves(true);
+        });
+
+        it('should return true on success', (done) => {
+            chai.request(server)
+                .post('/groups/131074/dimmer/5')
+                .end((err: any, res: any) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('dimmed').equals(true);
+                    res.body.should.have.property('value').equals('5');
+                    done();
+                });
+        });
+    });
 });

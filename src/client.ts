@@ -26,6 +26,10 @@ export class Client {
         return this.tradfri.operateGroup(group, {onOff: onOff}, true);
     }
 
+    async operateGroupForDimming(group: Group, dimmerValue: number) {
+        return this.tradfri.operateGroup(group, {dimmer: dimmerValue}, true);
+    }
+
     get devices(): Record<string, Accessory> {
         return this.tradfri.devices;
     }
