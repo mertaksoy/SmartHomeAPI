@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "It allows you to control your IKEA smart home appliances via rest api.",
   "main": "index.js",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "scripts": {
     "start:dev": "nodemon",
     "build": "rimraf ./build && tsc",
