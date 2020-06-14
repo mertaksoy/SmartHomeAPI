@@ -1,6 +1,6 @@
 {
   "name": "smarthome-api",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "It allows you to control your IKEA smart home appliances via rest api.",
   "main": "index.js",
   "scripts": {
